@@ -1,0 +1,17 @@
+<html xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <h1>Liste des auteurs</h1>
+        <table border="1">
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Prenom</th>
+            </tr>
+            <tr th:each="auteur : ${auteurs}">
+                <td th:text="${auteur.id}" />
+                <td th:text="${auteur.nom}" />
+                <td th:text="${auteur.prenom}" />
+            </tr>
+        </table>
+    </body>
+</html>
