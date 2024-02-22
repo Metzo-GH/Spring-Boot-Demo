@@ -20,7 +20,7 @@ public class AuteursController {
     public String home(Model model){
         Iterable<Auteurs> auteurs = service.getAllAuteurs();
         model.addAttribute("auteurs", auteurs);
-        return "/bib/home";
+        return "/home";
     }
 
     @PostMapping("/init")
