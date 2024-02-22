@@ -12,10 +12,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="auteur : ${auteurs}">
-                    <td th:text="${auteur.id}"></td>
-                    <td th:text="${auteur.nom}"></td>
-                    <td th:text="${auteur.prenom}"></td>
+                <tr th:each="auteurs : ${auteurs}">
+                    <td th:text="${auteurs.id}"></td>
+                    <td th:text="${auteurs.nom}"></td>
+                    <td th:text="${auteurs.prenom}"></td>
                 </tr>
             </tbody>
         </table>
