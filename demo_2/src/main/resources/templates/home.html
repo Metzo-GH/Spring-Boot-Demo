@@ -1,0 +1,43 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div>
+        <h2>Liste des auteurs</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="auteur : ${auteurs}">
+                    <td th:text="${auteur.id}"></td>
+                    <td th:text="${auteur.nom}"></td>
+                    <td th:text="${auteur.prenom}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h2>Initialiser les auteurs</h2>
+        <form action="/bib/init" method="post">
+            <button type="submit">Initialiser</button>
+        </form>
+    </div>
+
+    <div>
+        <h2>Ajouter un nouvel auteur</h2>
+        <form action="/bib/add" method="post">
+            <label for="nom">Nom :</label>
+            <input type="text" id="nom" name="nom"><br><br>
+            <label for="prenom">Prénom :</label>
+            <input type="text" id="prenom" name="prenom"><br><br>
+            <button type="submit">Ajouter</button>
+        </form>
+    </div>
+</body>
+
+</html>
