@@ -13,11 +13,16 @@ import com.tpagenda.tpagenda.Repository.PersonneRepository;
 import com.tpagenda.tpagenda.Services.AgendaServices;
 import com.tpagenda.tpagenda.Services.PersonneServices;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class AuthController {
     @Autowired
     private PersonneServices personneServices;
+    @Autowired
     private PersonneRepository personneRepository;
+    @Autowired
     private AgendaServices agendaService;
 
     @GetMapping("/login")
@@ -63,5 +68,15 @@ public class AuthController {
         model.addAttribute("agendas", agendas);
         model.addAttribute("newAgenda", new Agenda());
         return "loginsuccess";
+    }
+
+     @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return "redirect:/login";
+        
     }
 }
