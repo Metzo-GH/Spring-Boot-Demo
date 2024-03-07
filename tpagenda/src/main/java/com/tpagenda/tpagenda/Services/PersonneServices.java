@@ -6,7 +6,6 @@ import com.tpagenda.tpagenda.Personne;
 
 @Service
 public interface PersonneServices {
-    void init();
-    void ajoutAuteurs( String nom, String prenom);
-    Iterable<Personne> getAllAuteurs();
+    void ajoutPersonne(String email, String password, String prenom, String nom);
+    Iterable<Personne> getAllPersonne();
 }
