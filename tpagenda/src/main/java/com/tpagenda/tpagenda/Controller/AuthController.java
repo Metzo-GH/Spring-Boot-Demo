@@ -40,6 +40,16 @@ public class AuthController {
         return "loginError";
     }
 
+    @PostMapping("/loginError")
+    public String loginError(@RequestParam("email") String email, @RequestParam("password") String password) {
+        Personne personne = personneRepository.findByEmailAndPassword(email, password);
+        if (personne != null) {
+            return "redirect:/loginsuccess";
+        } else {
+            return "redirect:/loginError";
+        }
+    }
+
     @PostMapping("/register")
     public String register(@ModelAttribute("personne") Personne personne) {
         personneRepository.save(personne);
