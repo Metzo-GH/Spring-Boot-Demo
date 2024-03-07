@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -12,10 +11,12 @@ import com.tpagenda.tpagenda.Personne;
 import com.tpagenda.tpagenda.Agenda;
 import com.tpagenda.tpagenda.Repository.PersonneRepository;
 import com.tpagenda.tpagenda.Services.AgendaServices;
+import com.tpagenda.tpagenda.Services.PersonneServices;
 
 @Controller
 public class AuthController {
     @Autowired
+    private PersonneServices personneServices;
     private PersonneRepository personneRepository;
     private AgendaServices agendaService;
 
@@ -51,8 +52,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute("personne") Personne personne) {
-        personneRepository.save(personne);
+    public String register(@RequestParam String regEmail, @RequestParam String regPassword, @RequestParam String firstName, @RequestParam String lastName) {
+        personneServices.ajoutPersonne(regEmail,regPassword,firstName,lastName);
         return "redirect:/login";
     }
 
