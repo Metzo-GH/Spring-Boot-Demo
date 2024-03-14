@@ -1,16 +1,24 @@
 package com.tpagenda.tpagenda.Controller;
 
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tpagenda.tpagenda.Personne;
 import com.tpagenda.tpagenda.Agenda;
+import com.tpagenda.tpagenda.Evenement;
 import com.tpagenda.tpagenda.Repository.PersonneRepository;
 import com.tpagenda.tpagenda.Services.AgendaServices;
+import com.tpagenda.tpagenda.Services.EvenementService;
 import com.tpagenda.tpagenda.Services.PersonneServices;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +32,8 @@ public class AuthController {
     private PersonneRepository personneRepository;
     @Autowired
     private AgendaServices agendaService;
+    @Autowired
+    private EvenementService evenementService;
 
     @GetMapping("/login")
     public String login(Model model) {
@@ -37,7 +47,7 @@ public class AuthController {
             HttpSession session) {
         Personne personne = personneRepository.findByEmailAndPassword(email, password);
         if (personne != null) {
-            session.setAttribute("email", email); // Stocker l'email dans la session
+            session.setAttribute("email", email);
             return "redirect:/loginsuccess";
         } else {
             return "redirect:/loginError";
@@ -55,7 +65,7 @@ public class AuthController {
             HttpSession session) {
         Personne personne = personneRepository.findByEmailAndPassword(email, password);
         if (personne != null) {
-            session.setAttribute("email", email); // Stocker l'email dans la session
+            session.setAttribute("email", email);
             return "redirect:/loginsuccess";
         } else {
             return "redirect:/loginError";
@@ -73,10 +83,8 @@ public class AuthController {
 
     @GetMapping("/loginsuccess")
     public String loginsuccess(Model model, HttpSession session) {
-        String email = (String) session.getAttribute("email"); // Supposons que vous stockiez l'identifiant de la
-                                                               // personne dans la session
-        Iterable<Agenda> agendas = agendaService.getAgendasByEmail(email); // Récupérez les agendas associés à la
-                                                                           // personne connectée
+        String email = (String) session.getAttribute("email");
+        Iterable<Agenda> agendas = agendaService.getAgendasByEmail(email);
         model.addAttribute("agendas", agendas);
         model.addAttribute("newAgenda", new Agenda());
         return "loginsuccess";
@@ -84,10 +92,8 @@ public class AuthController {
 
     @PostMapping("/addAgenda")
     public String ajoutAgenda(@RequestParam String nom, HttpSession session) {
-        String email = (String) session.getAttribute("email"); // Supposons que vous stockiez l'identifiant de la
-                                                               // personne dans la session
-        agendaService.ajoutAgenda(email, nom); // Utilisez l'identifiant de la personne pour associer l'agenda à la
-                                               // personne
+        String email = (String) session.getAttribute("email");
+        agendaService.ajoutAgenda(email, nom);
         return "redirect:/loginsuccess";
     }
 
@@ -99,4 +105,23 @@ public class AuthController {
         }
         return "redirect:/login";
     }
+
+    @GetMapping("/loginsuccess/evenements/{nomAgenda}")
+    public String listEvenements(@PathVariable String nomAgenda, Model model) {
+        List<Evenement> evenements = evenementService.getEvenementsByNomAgenda(nomAgenda);
+        model.addAttribute("evenements", evenements);
+        return "loginSuccessEvenement";
+    }
+
+    @PostMapping("/agenda/addEvenement/{nomAgenda}")
+    public String addEvenement(@PathVariable String nomAgenda,
+            @RequestParam String nomEvenement,
+            @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date date,
+            @RequestParam String startTime,
+            @RequestParam String endTime,
+            @RequestParam String label) {
+        evenementService.ajouterEvenement(nomAgenda, date, startTime, endTime, label);
+        return "redirect:/loginsuccess/evenements/" + nomAgenda;
+    }
+
 }

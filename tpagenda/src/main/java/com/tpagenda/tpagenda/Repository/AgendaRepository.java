@@ -9,6 +9,7 @@ import com.tpagenda.tpagenda.Agenda;
 import com.tpagenda.tpagenda.Personne;
 
 @Repository
-public interface AgendaRepository extends CrudRepository<Agenda, Long> {
+public interface AgendaRepository extends CrudRepository<Agenda, String> {
     List<Agenda> findByPersonne(Personne personne);
+    Agenda findByNom(String nom);
 }

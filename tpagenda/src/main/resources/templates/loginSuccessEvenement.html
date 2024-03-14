@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Liste des événements de l'agenda</title>
+</head>
+
+<body>
+    <h2>Liste des événements de l'agenda</h2>
+    <div>
+        <h3>Événements</h3>
+        <ul>
+            <li th:each="evenement : ${evenements}" th:text="${evenement.label}"></li>
+        </ul>
+    </div>
+
+    <div>
+        <h3>Ajouter un événement</h3>
+        <form th:action="@{/agenda/addEvenement/{nomAgenda}(nomAgenda=${nomAgenda})}" th:object="${newEvenement}"
+            method="post">
+
+            <div>
+                <label for="nomEvenement">Nom:</label>
+                <input type="text" id="nomEvenement" name="nomEvenement">
+            </div>
+            <div>
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date">
+            </div>
+            <div>
+                <label for="startTime">Heure de début:</label>
+                <input type="time" id="startTime" name="startTime">
+            </div>
+            <div>
+                <label for="endTime">Heure de fin:</label>
+                <input type="time" id="endTime" name="endTime">
+            </div>
+            <div>
+                <label for="label">Libellé:</label>
+                <input type="text" id="label" name="label">
+            </div>
+            <button type="submit">Ajouter</button>
+        </form>
+    </div>
+
+    <div>
+        <a href="/logout">Se déconnecter</a>
+    </div>
+</body>
+
+</html>

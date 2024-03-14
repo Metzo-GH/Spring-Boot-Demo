@@ -1,9 +1,13 @@
 package com.tpagenda.tpagenda;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Agenda {
@@ -15,6 +19,9 @@ public class Agenda {
     @ManyToOne
     @JoinColumn(name = "email", insertable = false, updatable = false)
     private Personne personne;
+
+    @OneToMany(mappedBy = "agenda", cascade = CascadeType.ALL)
+    private List<Evenement> Evenement;
 
     public Agenda() {
     }

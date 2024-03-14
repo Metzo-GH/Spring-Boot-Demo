@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Welcome</title>
+    <title>Bonjour</title>
 </head>
 <body>
-    <h2>Welcome</h2>
+    <h2>Bonjour</h2>
     <div>
         <h3>Liste des agendas</h3>
         <ul>
-            <li th:each="agenda : ${agendas}" th:text="${agenda.nom}"></li>
+            <li th:each="agenda : ${agendas}">
+                <a th:href="@{'/loginsuccess/evenements/' + ${agenda.nom}}" th:text="${agenda.nom}">Voir les événements</a>
+            </li>
         </ul>
     </div>
     
