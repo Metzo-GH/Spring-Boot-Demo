@@ -1,36 +1,50 @@
 package com.tpagenda.tpagenda;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Agenda {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String email;
     private String nom;
+
+    @ManyToOne
+    @JoinColumn(name = "email", insertable = false, updatable = false)
+    private Personne personne;
 
     public Agenda() {
     }
 
-    public Agenda(String nom) {
+    public Agenda(String email, String nom) {
+        this.email = email;
         this.nom = nom;
     }
 
-    public Long getId() {
-        return id;
+    public String getEmail() {
+        return email;
     }
-    public void setId(Long id) {
-        this.id = id;
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getNom() {
         return nom;
     }
+
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    public Personne getPersonne() {
+        return personne;
+    }
+
+    public void setPersonne(Personne personne) {
+        this.personne = personne;
     }
 }
