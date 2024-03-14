@@ -25,7 +25,7 @@ public class AgendaServicesImpl implements AgendaServices {
         agendaRepository.save(new Agenda(email, nom));
     }
 
-     @Autowired
+    @Autowired
     private PersonneRepository personneRepository;
     
     public List<Agenda> getAgendasByEmail(String email) {

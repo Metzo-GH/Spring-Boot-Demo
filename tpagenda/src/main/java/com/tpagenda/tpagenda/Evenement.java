@@ -17,29 +17,23 @@ public class Evenement {
     private String startTime;
     private String endTime;
     private String label;
+    private String nom;
 
     @ManyToOne
-    @JoinColumn(name = "nom")
+    @JoinColumn(name = "nom", insertable = false, updatable = false)
     private Agenda agenda;
 
 
     public Evenement() {
     }
 
-    public Evenement(String nomEvenement, Date date, String startTime, String endTime, String label) {
+    public Evenement(String nomEvenement, Date date, String startTime, String endTime, String label, String nom) {
         this.nomEvenement = nomEvenement;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
         this.label = label;
-    }
-
-    public Agenda getAgenda() {
-        return agenda;
-    }
-
-    public void setAgenda(Agenda agenda) {
-        this.agenda = agenda;
+        this.nom = nom;
     }
 
     public String getNomEvenement() {
@@ -80,5 +74,21 @@ public class Evenement {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getNom() {
+        return label;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public Agenda getAgenda() {
+        return agenda;
+    }
+
+    public void setAgenda(Agenda agenda) {
+        this.agenda = agenda;
     }
 }

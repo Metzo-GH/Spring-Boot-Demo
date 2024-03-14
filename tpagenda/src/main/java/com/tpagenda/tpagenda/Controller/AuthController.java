@@ -8,7 +8,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -120,8 +119,15 @@ public class AuthController {
             @RequestParam String startTime,
             @RequestParam String endTime,
             @RequestParam String label) {
-        evenementService.ajouterEvenement(nomAgenda, date, startTime, endTime, label);
+        evenementService.ajouterEvenement(nomAgenda, date, startTime, endTime, label, nomAgenda);
         return "redirect:/loginsuccess/evenements/" + nomAgenda;
     }
+    
+        @GetMapping("/evenement-details/{nomEvenement}")
+        public String showEvenementDetails(@PathVariable String nomEvenement, Model model) {
+            Evenement evenement = evenementService.getEvenementByNom(nomEvenement);
+            model.addAttribute("evenement", evenement);
+            return "evenementDetails";
+        }
 
 }

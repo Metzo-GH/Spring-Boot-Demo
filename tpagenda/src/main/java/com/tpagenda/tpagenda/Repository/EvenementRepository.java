@@ -9,7 +9,7 @@ import com.tpagenda.tpagenda.Agenda;
 import com.tpagenda.tpagenda.Evenement;
 
 @Repository
-public interface EvenementRepository extends CrudRepository<Evenement, String> {
+public interface EvenementRepository extends CrudRepository<Evenement, Long> {
     List<Evenement> findByAgenda(Agenda agenda);
-    List<Evenement> findByNomEvenement(String nomEvenement);
+    Evenement findByNomEvenement(String nomEvenement);
 }

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Détails de l'événement</title>
+</head>
+
+<body>
+    <h2>Détails de l'événement</h2>
+    <div>
+        <p>Nom de l'événement: <span th:text="${evenement.label}"></span></p>
+        <p>Date: <span th:text="${evenement.date}"></span></p>
+        <p>Heure de début: <span th:text="${evenement.startTime}"></span></p>
+        <p>Heure de fin: <span th:text="${evenement.endTime}"></span></p>
+    </div>
+
+</body>
+
+</html>

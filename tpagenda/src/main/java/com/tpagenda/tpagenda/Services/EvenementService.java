@@ -10,8 +10,8 @@ import com.tpagenda.tpagenda.Evenement;
 
 @Service
 public interface EvenementService {
-    void ajouterEvenement(String nomEvenement, Date date, String startTime, String endTime, String label);
+    void ajouterEvenement(String nomEvenement, Date date, String startTime, String endTime, String label, String nom);
     Iterable<Evenement> getAllEvenements();
     List<Evenement> getEvenementsByNomAgenda(String nomAgenda);
-
+    Evenement getEvenementByNom(String nomEvenement);
 }
