@@ -47,7 +47,7 @@ public class AuthController {
         Personne personne = personneRepository.findByEmailAndPassword(email, password);
         if (personne != null) {
             session.setAttribute("email", email);
-            return "redirect:/loginsuccess";
+            return "redirect:/agenda/home";
         } else {
             return "redirect:/loginError";
         }
@@ -65,7 +65,7 @@ public class AuthController {
         Personne personne = personneRepository.findByEmailAndPassword(email, password);
         if (personne != null) {
             session.setAttribute("email", email);
-            return "redirect:/loginsuccess";
+            return "redirect:/agenda/home";
         } else {
             return "redirect:/loginError";
         }
@@ -80,7 +80,7 @@ public class AuthController {
         return "redirect:/login";
     }
 
-    @GetMapping("/loginsuccess")
+    @GetMapping("/agenda/home")
     public String loginsuccess(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
         Iterable<Agenda> agendas = agendaService.getAgendasByEmail(email);
@@ -93,7 +93,7 @@ public class AuthController {
     public String ajoutAgenda(@RequestParam String nom, HttpSession session) {
         String email = (String) session.getAttribute("email");
         agendaService.ajoutAgenda(email, nom);
-        return "redirect:/loginsuccess";
+        return "redirect:/agenda/home";
     }
 
     @GetMapping("/logout")
@@ -115,19 +115,19 @@ public class AuthController {
     @PostMapping("/agenda/addEvenement/{nomAgenda}")
     public String addEvenement(@PathVariable String nomAgenda,
             @RequestParam String nomEvenement,
-            @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date date,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
             @RequestParam String startTime,
             @RequestParam String endTime,
             @RequestParam String label) {
         evenementService.ajouterEvenement(nomEvenement, date, startTime, endTime, label, nomAgenda);
         return "redirect:/loginsuccess/evenements/" + nomAgenda;
     }
-    
-        @GetMapping("/evenement-details/{nomEvenement}")
-        public String showEvenementDetails(@PathVariable String nomEvenement, Model model) {
-            Evenement evenement = evenementService.getEvenementByNom(nomEvenement);
-            model.addAttribute("evenement", evenement);
-            return "evenementDetails";
-        }
+
+    @GetMapping("/evenement-details/{nomEvenement}")
+    public String showEvenementDetails(@PathVariable String nomEvenement, Model model) {
+        Evenement evenement = evenementService.getEvenementByNom(nomEvenement);
+        model.addAttribute("evenement", evenement);
+        return "evenementDetails";
+    }
 
 }
