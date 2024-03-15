@@ -8,12 +8,19 @@
 <body>
     <h2>Détails de l'événement</h2>
     <div>
-        <p>Nom de l'événement: <span th:text="${evenement.label}"></span></p>
+        <p>Nom de l'événement: <span th:text="${evenement.nomEvenement}"></span></p>
         <p>Date: <span th:text="${evenement.date}"></span></p>
         <p>Heure de début: <span th:text="${evenement.startTime}"></span></p>
         <p>Heure de fin: <span th:text="${evenement.endTime}"></span></p>
+        <p>Label: <span th:text="${evenement.label}"></span></p>
     </div>
 
+    <div>
+        <form action="/telecharger-pdf" method="post">
+            <input type="hidden" name="nomEvenement" th:value="${evenement.nomEvenement}" />
+            <button type="submit">Télécharger PDF</button>
+        </form>
+    </div>
 </body>
 
 </html>

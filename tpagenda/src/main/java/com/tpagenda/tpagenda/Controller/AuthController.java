@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.tpagenda.tpagenda.Personne;
 import com.tpagenda.tpagenda.Agenda;
 import com.tpagenda.tpagenda.Evenement;
+import com.tpagenda.tpagenda.PdfGenerator;
 import com.tpagenda.tpagenda.Repository.PersonneRepository;
 import com.tpagenda.tpagenda.Services.AgendaServices;
 import com.tpagenda.tpagenda.Services.EvenementService;
@@ -128,6 +130,12 @@ public class AuthController {
         Evenement evenement = evenementService.getEvenementByNom(nomEvenement);
         model.addAttribute("evenement", evenement);
         return "evenementDetails";
+    }
+
+    @PostMapping("/telecharger-pdf")
+    public ResponseEntity<byte[]> downloadPdf(@RequestParam String nomEvenement) {
+        Evenement evenement = evenementService.getEvenementByNom(nomEvenement);
+        return PdfGenerator.generatePdf(evenement);
     }
 
 }
