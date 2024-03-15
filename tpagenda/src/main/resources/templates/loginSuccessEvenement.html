@@ -3,52 +3,135 @@
 
 <head>
     <title>Liste des événements de l'agenda</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            margin-top: 30px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #f5f5f5;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 
 <body>
-    <h2>Liste des événements de l'agenda</h2>
-    <div>
-        <h3>Événements</h3>
-        <ul>
-            <li th:each="evenement : ${evenements}">
-                <a th:href="@{'/evenement-details/' + ${evenement.nomEvenement}}">
-                    <span th:text="${evenement.label}"></span>
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <div>
-        <h3>Ajouter un événement</h3>
-        <form th:action="@{/agenda/addEvenement/{nomAgenda}(nomAgenda=${nomAgenda})}" th:object="${newEvenement}"
-            method="post">
-
-            <div>
-                <label for="nomEvenement">Nom:</label>
-                <input type="text" id="nomEvenement" name="nomEvenement">
-            </div>
-            <div>
-                <label for="date">Date:</label>
-                <input type="date" id="date" name="date">
-            </div>
-            <div>
-                <label for="startTime">Heure de début:</label>
-                <input type="time" id="startTime" name="startTime">
-            </div>
-            <div>
-                <label for="endTime">Heure de fin:</label>
-                <input type="time" id="endTime" name="endTime">
-            </div>
-            <div>
-                <label for="label">Libellé:</label>
-                <input type="text" id="label" name="label">
-            </div>
-            <button type="submit">Ajouter</button>
-        </form>
-    </div>
-
-    <div>
-        <a href="/logout">Se déconnecter</a>
+    <div class="container">
+        <h2>Liste des événements de l'agenda</h2>
+        <div>
+            <h3>Événements</h3>
+            <ul>
+                <li th:each="evenement : ${evenements}">
+                    <a th:href="@{'/evenement-details/' + ${evenement.nomEvenement}}">
+                        <span th:text="${evenement.label}"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <h3>Ajouter un événement</h3>
+            <form th:action="@{/agenda/addEvenement/{nomAgenda}(nomAgenda=${nomAgenda})}" th:object="${newEvenement}"
+                method="post">
+                <div>
+                    <label for="nomEvenement">Nom:</label>
+                    <input type="text" id="nomEvenement" name="nomEvenement">
+                </div>
+                <div>
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date">
+                </div>
+                <div>
+                    <label for="startTime">Heure de début:</label>
+                    <input type="time" id="startTime" name="startTime">
+                </div>
+                <div>
+                    <label for="endTime">Heure de fin:</label>
+                    <input type="time" id="endTime" name="endTime">
+                </div>
+                <div>
+                    <label for="label">Libellé:</label>
+                    <input type="text" id="label" name="label">
+                </div>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
+        <div>
+            <a href="/logout">Se déconnecter</a>
+        </div>
     </div>
 </body>
 
