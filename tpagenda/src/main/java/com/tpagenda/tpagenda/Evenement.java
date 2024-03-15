@@ -10,19 +10,18 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class Evenement {
 
-    
     @Id
     private String nomEvenement;
     private Date date;
     private String startTime;
     private String endTime;
     private String label;
+
     private String nom;
 
     @ManyToOne
     @JoinColumn(name = "nom", insertable = false, updatable = false)
     private Agenda agenda;
-
 
     public Evenement() {
     }
@@ -77,7 +76,7 @@ public class Evenement {
     }
 
     public String getNom() {
-        return label;
+        return nom;
     }
 
     public void setNom(String nom) {

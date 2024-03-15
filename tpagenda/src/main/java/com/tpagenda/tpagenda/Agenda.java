@@ -12,8 +12,9 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class Agenda {
 
-    @Id
+    
     private String email;
+    @Id
     private String nom;
 
     @ManyToOne

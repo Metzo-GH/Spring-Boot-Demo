@@ -119,7 +119,7 @@ public class AuthController {
             @RequestParam String startTime,
             @RequestParam String endTime,
             @RequestParam String label) {
-        evenementService.ajouterEvenement(nomAgenda, date, startTime, endTime, label, nomAgenda);
+        evenementService.ajouterEvenement(nomEvenement, date, startTime, endTime, label, nomAgenda);
         return "redirect:/loginsuccess/evenements/" + nomAgenda;
     }
     
