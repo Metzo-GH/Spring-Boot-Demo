@@ -27,12 +27,16 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class AuthController {
+
     @Autowired
     private PersonneServices personneServices;
+
     @Autowired
     private PersonneRepository personneRepository;
+
     @Autowired
     private AgendaServices agendaService;
+
     @Autowired
     private EvenementService evenementService;
 
@@ -60,19 +64,6 @@ public class AuthController {
         return "loginError";
     }
 
-    @PostMapping("/loginError")
-    public String loginError(@RequestParam("email") String email,
-            @RequestParam("password") String password,
-            HttpSession session) {
-        Personne personne = personneRepository.findByEmailAndPassword(email, password);
-        if (personne != null) {
-            session.setAttribute("email", email);
-            return "redirect:/agenda/home";
-        } else {
-            return "redirect:/loginError";
-        }
-    }
-
     @PostMapping("/register")
     public String register(@RequestParam String regEmail,
             @RequestParam String regPassword,
@@ -85,6 +76,9 @@ public class AuthController {
     @GetMapping("/agenda/home")
     public String loginsuccess(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return "redirect:/login";
+        }
         Iterable<Agenda> agendas = agendaService.getAgendasByEmail(email);
         model.addAttribute("agendas", agendas);
         model.addAttribute("newAgenda", new Agenda());
@@ -94,6 +88,9 @@ public class AuthController {
     @PostMapping("/addAgenda")
     public String ajoutAgenda(@RequestParam String nom, HttpSession session) {
         String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return "redirect:/login";
+        }
         agendaService.ajoutAgenda(email, nom);
         return "redirect:/agenda/home";
     }
@@ -108,7 +105,11 @@ public class AuthController {
     }
 
     @GetMapping("/loginsuccess/evenements/{nomAgenda}")
-    public String listEvenements(@PathVariable String nomAgenda, Model model) {
+    public String listEvenements(@PathVariable String nomAgenda, Model model, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return "redirect:/login";
+        }
         List<Evenement> evenements = evenementService.getEvenementsByNomAgenda(nomAgenda);
         model.addAttribute("evenements", evenements);
         return "loginSuccessEvenement";
@@ -120,20 +121,44 @@ public class AuthController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
             @RequestParam String startTime,
             @RequestParam String endTime,
-            @RequestParam String label) {
+            @RequestParam String label, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return "redirect:/login";
+        }
         evenementService.ajouterEvenement(nomEvenement, date, startTime, endTime, label, nomAgenda);
         return "redirect:/loginsuccess/evenements/" + nomAgenda;
     }
 
     @GetMapping("/evenement-details/{nomEvenement}")
-    public String showEvenementDetails(@PathVariable String nomEvenement, Model model) {
+    public String showEvenementDetails(@PathVariable String nomEvenement, Model model, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return "redirect:/login";
+        }
         Evenement evenement = evenementService.getEvenementByNom(nomEvenement);
         model.addAttribute("evenement", evenement);
         return "evenementDetails";
     }
 
+    @GetMapping("/agenda/deleteEvenement/{nomEvenement}/{nomAgenda}")
+    public String deleteEvenement(@PathVariable String nomEvenement, @PathVariable String nomAgenda, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return "redirect:/login";
+        }
+        evenementService.deleteEvenement(nomEvenement);
+        return "redirect:/loginsuccess/evenements/" + nomAgenda;
+    }
+    
+    
+
     @PostMapping("/telecharger-pdf")
-    public ResponseEntity<byte[]> downloadPdf(@RequestParam String nomEvenement) {
+    public ResponseEntity<byte[]> downloadPdf(@RequestParam String nomEvenement, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return ResponseEntity.badRequest().build();
+        }
         Evenement evenement = evenementService.getEvenementByNom(nomEvenement);
         return PdfGenerator.generatePdf(evenement);
     }

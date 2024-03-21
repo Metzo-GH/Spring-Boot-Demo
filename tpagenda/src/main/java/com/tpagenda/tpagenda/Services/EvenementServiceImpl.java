@@ -46,4 +46,11 @@ public List<Evenement> getEvenementsByNomAgenda(String nomAgenda) {
         return evenementRepository.findByNomEvenement(nomEvenement);
     }
 
+    @SuppressWarnings("null")
+    @Override
+    public void deleteEvenement(String nomEvenement) {
+        evenementRepository.delete(evenementRepository.findByNomEvenement(nomEvenement));
+    }
+    
+
 }

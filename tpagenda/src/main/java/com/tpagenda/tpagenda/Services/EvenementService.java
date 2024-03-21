@@ -14,4 +14,7 @@ public interface EvenementService {
     Iterable<Evenement> getAllEvenements();
     List<Evenement> getEvenementsByNomAgenda(String nomAgenda);
     Evenement getEvenementByNom(String nomEvenement);
+    void deleteEvenement(String nomEvenement);
+    
+    
 }
