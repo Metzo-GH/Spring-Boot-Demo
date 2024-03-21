@@ -142,7 +142,8 @@ public class AuthController {
     }
 
     @GetMapping("/agenda/deleteEvenement/{nomEvenement}/{nomAgenda}")
-    public String deleteEvenement(@PathVariable String nomEvenement, @PathVariable String nomAgenda, HttpSession session) {
+    public String deleteEvenement(@PathVariable String nomEvenement, @PathVariable String nomAgenda,
+            HttpSession session) {
         String email = (String) session.getAttribute("email");
         if (email == null) {
             return "redirect:/login";
@@ -150,8 +151,6 @@ public class AuthController {
         evenementService.deleteEvenement(nomEvenement);
         return "redirect:/loginsuccess/evenements/" + nomAgenda;
     }
-    
-    
 
     @PostMapping("/telecharger-pdf")
     public ResponseEntity<byte[]> downloadPdf(@RequestParam String nomEvenement, HttpSession session) {
@@ -161,6 +160,17 @@ public class AuthController {
         }
         Evenement evenement = evenementService.getEvenementByNom(nomEvenement);
         return PdfGenerator.generatePdf(evenement);
+    }
+
+    @GetMapping("/agenda/printEvenements/{nomAgenda}")
+    public String printEvenements(@PathVariable String nomAgenda, Model model, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return "redirect:/login";
+        }
+        List<Evenement> evenements = evenementService.getEvenementsByNomAgenda(nomAgenda);
+        model.addAttribute("evenements", evenements);
+        return "printEvenements";
     }
 
 }
