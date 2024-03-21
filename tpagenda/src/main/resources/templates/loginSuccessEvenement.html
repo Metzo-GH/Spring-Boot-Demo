@@ -94,11 +94,13 @@
         <h2>Liste des événements de l'agenda</h2>
         <div>
             <h3>Événements</h3>
+            <a href="/agenda/printEvenements/{nomAgenda}" target="_blank">Imprimer</a>
             <ul>
                 <li th:each="evenement : ${evenements}">
                     <a th:href="@{'/evenement-details/' + ${evenement.nomEvenement}}">
                         <span th:text="${evenement.label}"></span>
                     </a>
+                    <a th:href="@{'/agenda/deleteEvenement/' + ${evenement.nomEvenement} + '/' + ${nomAgenda}}" th:text="Supprimer"></a>
                 </li>
             </ul>
         </div>
