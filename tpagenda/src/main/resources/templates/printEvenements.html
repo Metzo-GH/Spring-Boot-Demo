@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Impression des événements de l'agenda</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            margin-top: 30px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #f5f5f5;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Impression des événements de l'agenda</h2>
+        <div>
+            <h3>Événements</h3>
+            <ul>
+                <li th:each="evenement : ${evenements}">
+                    <span th:text="${evenement.label}"></span>
+                    <p>Date : <span th:text="${evenement.date}"></span></p>
+                    <p>Heure de début : <span th:text="${evenement.startTime}"></span></p>
+                    <p>Heure de fin : <span th:text="${evenement.endTime}"></span></p>
+                    <p>Libellé : <span th:text="${evenement.label}"></span></p>
+                    <p>Description : <span th:text="${evenement.description}"></span></p>
+                </li>
+            </ul>
+        </div>
+        <div class="no-print">
+            <a href="/logout">Se déconnecter</a>
+        </div>
+    </div>
+    <script>
+        window.print();
+    </script>
+</body>
+
+</html>
