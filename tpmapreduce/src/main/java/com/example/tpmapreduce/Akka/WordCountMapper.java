@@ -1,35 +1,39 @@
 package com.example.tpmapreduce.Akka;
 
-import akka.actor.ActorSelection;
+import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
+
+import java.util.StringTokenizer;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class WordCountMapper extends UntypedActor {
 
-  private final AkkaService akkaService;
+  private final ActorRef reducer;
 
-  public WordCountMapper(AkkaService akkaService) {
-    this.akkaService = akkaService;
+  public WordCountMapper(ActorRef reducer) {
+    this.reducer = reducer;
   }
 
   @Override
   public void onReceive(Object message) throws Exception {
     if (message instanceof String) {
       String line = (String) message;
-      String[] words = line.split("\\s+");
-      for (String word : words) {
-        ActorSelection reducer = akkaService.getReducer(word);
-        reducer.tell(new WordCountMessage(word, 1), getSelf());
+      StringTokenizer tokenizer = new StringTokenizer(line);
+      while (tokenizer.hasMoreElements()) {
+        String word = tokenizer.nextToken();
+        WordCountReducer.WordCountMessage msg = new WordCountReducer.WordCountMessage(word, 1);
+        reducer.tell(msg, getSelf());
       }
     } else {
       unhandled(message);
     }
   }
 
-  public static Props props() {
-    return Props.create(WordCountMapper.class, AkkaService.class);
+  public static Props props(ActorRef reducer) {
+    return Props.create(WordCountMapper.class, reducer);
   }
 
 }
