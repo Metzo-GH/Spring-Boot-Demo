@@ -1,11 +1,13 @@
 package com.example.tpmapreduce.Controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import akka.actor.ActorSystem;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
@@ -14,7 +16,7 @@ public class AkkaController {
     private ActorSystem actorSystem;
 
     @PostConstruct
-    public void initActors() {
+    public void initActor() {
         actorSystem = ActorSystem.create("WordCountSystem");
     }
 

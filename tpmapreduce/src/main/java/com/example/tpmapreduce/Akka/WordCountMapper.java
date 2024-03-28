@@ -1,6 +1,6 @@
 package com.example.tpmapreduce.Akka;
 
-import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class WordCountMapper extends UntypedActor {
       String line = (String) message;
       String[] words = line.split("\\s+");
       for (String word : words) {
-        ActorRef reducer = context().actorFor(akkaService.getReducer(word).path());
+        ActorSelection reducer = akkaService.getReducer(word);
         reducer.tell(new WordCountMessage(word, 1), getSelf());
       }
     } else {
