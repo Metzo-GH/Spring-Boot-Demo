@@ -20,7 +20,7 @@ public class WordCountMapper extends UntypedActor {
       String line = (String) message;
       String[] words = line.split("\\s+");
       for (String word : words) {
-        ActorRef reducer = akkaService.getReducer(word);
+        ActorRef reducer = context().actorFor(akkaService.getReducer(word).path());
         reducer.tell(new WordCountMessage(word, 1), getSelf());
       }
     } else {

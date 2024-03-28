@@ -3,10 +3,14 @@ package com.example.tpmapreduce.Akka;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AkkaService {
@@ -47,10 +51,8 @@ public class AkkaService {
     // Interroger chaque acteur Reducer dans le système d'acteurs 2 pour obtenir le nombre d'occurrences du mot
     for (ActorRef reducer : reducers) {
       WordCountReducer.WordCountQuery query = new WordCountReducer.WordCountQuery(word);
-      WordCountReducer.WordCountResult result = (WordCountReducer.WordCountResult) Await.result(
-          Patterns.ask(reducer, query, Duration.ofSeconds(5)),
-          Duration.ofSeconds(5)
-      );
+      WordCountReducer.WordCountResult result = (WordCountReducer.WordCountResult) Patterns.ask(reducer, query,
+          Timeout.create(Duration.ofSeconds(5))).toCompletableFuture().get(5, TimeUnit.SECONDS);
       count += result.getCount();
     }
     return count;
