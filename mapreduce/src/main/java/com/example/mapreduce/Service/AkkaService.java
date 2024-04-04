@@ -32,12 +32,14 @@ public class AkkaService {
         for (int i = 0; i < mappers.length; i++) {
             String mapperName = "mapper" + System.currentTimeMillis() + "_" + i;
             mappers[i] = actorSystem.actorOf(Props.create(MapperActor.class), mapperName);
+            System.out.println(mapperName);
         }
     
         // Initialisation des acteurs Reducer
         for (int i = 0; i < reducers.length; i++) {
             String reducerName = "reducer" + System.currentTimeMillis() + "_" + i;
             reducers[i] = actorSystem.actorOf(Props.create(ReducerActor.class), reducerName);
+            System.out.println(reducerName);
         }
     }    
 
@@ -57,10 +59,10 @@ public class AkkaService {
         }
     }
 
-    // Méthode pour interroger les Reducers pour obtenir le nombre d'occurrences
-    // d'un mot
+    // Méthode pour interroger les Reducers pour obtenir le nombre d'occurrences d'un mot
     public CompletionStage<Object> queryReducer(ActorRef reducer, String word) {
         // Envoyer une demande à l'acteur Reducer et attendre une réponse
         return Patterns.ask(reducer, word, Duration.ofSeconds(5));
     }
+
 }

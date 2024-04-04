@@ -32,14 +32,13 @@ public class AkkaController {
 
     @RequestMapping("/")
     public String index(Model model) {
-        // Vous pouvez ajouter des données au modèle ici si nécessaire
-        return "index"; // Cela renvoie le nom du fichier HTML (index.html dans notre cas)
+        return "index";
     }
 
     @PostMapping("/init")
     public String initializeActors() {
         akkaService.initializeActors();
-        return "redirect:/"; // Redirige vers la page d'accueil après l'initialisation
+        return "redirect:/";
     }
 
     @PostMapping("/file")
@@ -71,7 +70,7 @@ public String searchWord(@RequestParam("word") String word, Model model) {
             e.printStackTrace();
         }
     }
-    return "redirect:/";
+    return "/";
 }
 
 }
