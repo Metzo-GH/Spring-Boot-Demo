@@ -32,15 +32,18 @@ public class AkkaService {
     }
 
     // Méthode de partitionnement
-    private String partition(String word) {
+    private ActorRef partition(String word) {
         int reducerCount = reducers.length; // Nombre de Reducers
-        return Integer.toString(Math.abs(word.hashCode() % reducerCount));
+        int reducerIndex = Math.abs(word.hashCode() % reducerCount);
+        return reducers[reducerIndex];
     }
 
     // Méthode pour distribuer les lignes du fichier aux Mappers
-    public void distributeLines(String[] lines) {
-        for (int i = 0; i < lines.length; i++) {
-            mappers[i % mappers.length].tell(lines[i], ActorRef.noSender());
+    public void distributeLines(String line) {
+        String[] words = line.split("\\s+");
+        for (String word : words) {
+            ActorRef reducer = partition(word);
+            mappers[(int) (Math.random() * mappers.length)].tell(word, reducer);
         }
     }
 
@@ -51,4 +54,3 @@ public class AkkaService {
         }
     }
 }
-
