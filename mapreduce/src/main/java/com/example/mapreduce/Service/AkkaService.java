@@ -17,16 +17,19 @@ public class AkkaService {
 
     public AkkaService() {
         actorSystem = ActorSystem.create("MapReduceSystem");
+        mappers = new ActorRef[3];
+        reducers = new ActorRef[2];
+        initializeActors();
+    }
 
+    public void initializeActors() {
         // Initialisation des acteurs Mapper
-        mappers = new ActorRef[3]; // Vous pouvez ajuster le nombre de Mappers selon vos besoins
-        for (int i = 0; i < mappers.length; i++) {
+        for (int i = 1; i <= mappers.length; i++) {
             mappers[i] = actorSystem.actorOf(Props.create(MapperActor.class), "mapper" + i);
         }
 
         // Initialisation des acteurs Reducer
-        reducers = new ActorRef[2]; // Vous pouvez ajuster le nombre de Reducers selon vos besoins
-        for (int i = 0; i < reducers.length; i++) {
+        for (int i = 1; i <= reducers.length; i++) {
             reducers[i] = actorSystem.actorOf(Props.create(ReducerActor.class), "reducer" + i);
         }
     }
@@ -47,7 +50,8 @@ public class AkkaService {
         }
     }
 
-    // Méthode pour interroger les Reducers pour obtenir le nombre d'occurrences d'un mot
+    // Méthode pour interroger les Reducers pour obtenir le nombre d'occurrences
+    // d'un mot
     public void queryReducer(String word) {
         for (ActorRef reducer : reducers) {
             reducer.tell(word, ActorRef.noSender());
