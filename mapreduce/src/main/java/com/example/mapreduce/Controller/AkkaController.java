@@ -7,12 +7,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.example.mapreduce.Service.AkkaService;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import com.example.mapreduce.Service.AkkaService;
+
+import akka.actor.ActorRef;
 
 @Controller
 public class AkkaController {
@@ -53,12 +59,19 @@ public class AkkaController {
     }
 
     @PostMapping("/search")
-    public String searchWord(@RequestParam("words") String words, Model model) {
-        if (!words.isEmpty()) {
-            // Appeler le service Akka pour rechercher les mots et récupérer les résultats
-            // Map<String, Integer> searchResults = akkaService.searchWord(words);
-            // model.addAttribute("results", searchResults);
+public String searchWord(@RequestParam("word") String word, Model model) {
+    if (!word.isEmpty()) {
+        ActorRef reducer = akkaService.partition(word);
+        CompletionStage<Object> stage = akkaService.queryReducer(reducer, word);
+        CompletableFuture<Object> future = stage.toCompletableFuture();
+        try {
+            Object result = future.get(5, TimeUnit.SECONDS);
+            model.addAttribute("searchResult", result);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            e.printStackTrace();
         }
-        return "redirect:/"; // Redirige vers la page d'accueil après la recherche
     }
+    return "redirect:/";
+}
+
 }

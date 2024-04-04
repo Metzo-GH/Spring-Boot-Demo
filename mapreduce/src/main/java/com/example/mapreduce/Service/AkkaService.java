@@ -5,6 +5,11 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.concurrent.CompletionStage;
+
+import akka.pattern.Patterns;
+
 import com.example.mapreduce.Actor.MapperActor;
 import com.example.mapreduce.Actor.ReducerActor;
 
@@ -37,7 +42,7 @@ public class AkkaService {
     }    
 
     // Méthode de partitionnement
-    private ActorRef partition(String word) {
+    public ActorRef partition(String word) {
         int reducerCount = reducers.length; // Nombre de Reducers
         int reducerIndex = Math.abs(word.hashCode() % reducerCount);
         return reducers[reducerIndex];
@@ -54,9 +59,8 @@ public class AkkaService {
 
     // Méthode pour interroger les Reducers pour obtenir le nombre d'occurrences
     // d'un mot
-    public void queryReducer(String word) {
-        for (ActorRef reducer : reducers) {
-            reducer.tell(word, ActorRef.noSender());
-        }
+    public CompletionStage<Object> queryReducer(ActorRef reducer, String word) {
+        // Envoyer une demande à l'acteur Reducer et attendre une réponse
+        return Patterns.ask(reducer, word, Duration.ofSeconds(5));
     }
 }
