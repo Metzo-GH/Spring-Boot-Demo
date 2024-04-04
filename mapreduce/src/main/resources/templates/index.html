@@ -31,6 +31,11 @@
             <input type="text" name="words" id="words"><br>
             <button type="submit">Rechercher</button>
         </form>
+        <!-- Nouveau résultat de recherche -->
+        <div th:if="${searchResult != null}">
+            <h3>Résultat de la recherche</h3>
+            <p>Le mot <span th:text="${searchResult.word}"></span> a été trouvé <span th:text="${searchResult.count}"></span> fois.</p>
+        </div>
     </div>
 
 </body>
