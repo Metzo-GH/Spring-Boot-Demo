@@ -24,15 +24,17 @@ public class AkkaService {
 
     public void initializeActors() {
         // Initialisation des acteurs Mapper
-        for (int i = 1; i <= mappers.length; i++) {
-            mappers[i] = actorSystem.actorOf(Props.create(MapperActor.class), "mapper" + i);
+        for (int i = 0; i < mappers.length; i++) {
+            String mapperName = "mapper" + System.currentTimeMillis() + "_" + i;
+            mappers[i] = actorSystem.actorOf(Props.create(MapperActor.class), mapperName);
         }
-
+    
         // Initialisation des acteurs Reducer
-        for (int i = 1; i <= reducers.length; i++) {
-            reducers[i] = actorSystem.actorOf(Props.create(ReducerActor.class), "reducer" + i);
+        for (int i = 0; i < reducers.length; i++) {
+            String reducerName = "reducer" + System.currentTimeMillis() + "_" + i;
+            reducers[i] = actorSystem.actorOf(Props.create(ReducerActor.class), reducerName);
         }
-    }
+    }    
 
     // Méthode de partitionnement
     private ActorRef partition(String word) {
