@@ -3,6 +3,7 @@ package com.example.mapreduce.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,14 +24,11 @@ import akka.actor.ActorRef;
 @Controller
 public class AkkaController {
 
-    private final AkkaService akkaService;
-
     @Autowired
-    public AkkaController(AkkaService akkaService) {
-        this.akkaService = akkaService;
-    }
+    private AkkaService akkaService;
 
-    @RequestMapping("/")
+    
+   @GetMapping("/")
     public String index(Model model) {
         return "index";
     }
@@ -44,23 +42,16 @@ public class AkkaController {
     @PostMapping("/file")
     public String analyzeFile(@RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    akkaService.distributeLines(line);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            akkaService.distributeLines(file);
+            return "redirect:/";
         }
         return "redirect:/"; // Redirige vers la page d'accueil après l'analyse du fichier
     }
 
-    @PostMapping("/search")
+     @PostMapping("/search")
 public String searchWord(@RequestParam("word") String word, Model model) {
     if (!word.isEmpty()) {
-        ActorRef reducer = akkaService.partition(word);
+        
         CompletionStage<Object> stage = akkaService.queryReducer(reducer, word);
         CompletableFuture<Object> future = stage.toCompletableFuture();
         try {
@@ -70,7 +61,7 @@ public String searchWord(@RequestParam("word") String word, Model model) {
             e.printStackTrace();
         }
     }
-    return "/";
+    return "index";
 }
 
 }

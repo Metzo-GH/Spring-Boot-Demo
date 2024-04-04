@@ -4,8 +4,14 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 
 import akka.pattern.Patterns;
@@ -16,46 +22,52 @@ import com.example.mapreduce.Actor.ReducerActor;
 @Service
 public class AkkaService {
 
-    private final ActorSystem actorSystem;
-    private final ActorRef[] mappers;
-    private final ActorRef[] reducers;
+    private ActorSystem actorSystem;
+    private ActorRef[] mappers;
+    private ActorRef[] reducers;
 
-    public AkkaService() {
+    private List<ActorRef> reducersList;
+
+
+    public void initializeActors() {
+
         actorSystem = ActorSystem.create("MapReduceSystem");
         mappers = new ActorRef[3];
         reducers = new ActorRef[2];
-        initializeActors();
-    }
-
-    public void initializeActors() {
         // Initialisation des acteurs Mapper
-        for (int i = 0; i < mappers.length; i++) {
-            String mapperName = "mapper" + System.currentTimeMillis() + "_" + i;
-            mappers[i] = actorSystem.actorOf(Props.create(MapperActor.class), mapperName);
-            System.out.println(mapperName);
-        }
+        
     
         // Initialisation des acteurs Reducer
-        for (int i = 0; i < reducers.length; i++) {
-            String reducerName = "reducer" + System.currentTimeMillis() + "_" + i;
+        for (int i = 0; i < 2 ; i++) {
+            String reducerName = "reducer" + i;
             reducers[i] = actorSystem.actorOf(Props.create(ReducerActor.class), reducerName);
             System.out.println(reducerName);
         }
+
+        reducersList = Arrays.asList(reducers);
+
+        for (int i = 0; i < mappers.length; i++) {
+            String mapperName = "mapper" + System.currentTimeMillis() + "_" + i;
+            mappers[i] = actorSystem.actorOf(Props.create(MapperActor.class,reducersList), mapperName);
+            System.out.println(mapperName);
+        }
     }    
 
-    // Méthode de partitionnement
-    public ActorRef partition(String word) {
-        int reducerCount = reducers.length; // Nombre de Reducers
-        int reducerIndex = Math.abs(word.hashCode() % reducerCount);
-        return reducers[reducerIndex];
-    }
-
     // Méthode pour distribuer les lignes du fichier aux Mappers
-    public void distributeLines(String line) {
-        String[] words = line.split("\\s+");
-        for (String word : words) {
-            ActorRef reducer = partition(word);
-            mappers[(int) (Math.random() * mappers.length)].tell(word, reducer);
+    public void distributeLines(MultipartFile file) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            int mapperId = 0;
+            int lineNumber = 0;
+            while ((line = reader.readLine()) != null) {
+                System.out.println("Distributing line {"+ lineNumber+"} to mapper {"+ mapperId+"}");
+                mappers[mapperId].tell(line, ActorRef.noSender());
+                mapperId = (mapperId + 1) % mappers.length;
+                lineNumber++;
+            }
+            System.out.println("Total lines distributed: {"+ lineNumber+"}");
+        } catch (Exception e) {
+            System.out.println("Error distributing file lines"+ e);
         }
     }
 
