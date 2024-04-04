@@ -3,21 +3,25 @@ package com.example.mapreduce.Service;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import akka.pattern.AskTimeoutException;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
+import scala.compat.java8.FutureConverters;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.mapreduce.Actor.MapperActor;
+import com.example.mapreduce.Actor.ReducerActor;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
-
-import akka.pattern.Patterns;
-
-import com.example.mapreduce.Actor.MapperActor;
-import com.example.mapreduce.Actor.ReducerActor;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AkkaService {
@@ -28,17 +32,12 @@ public class AkkaService {
 
     private List<ActorRef> reducersList;
 
-
     public void initializeActors() {
-
         actorSystem = ActorSystem.create("MapReduceSystem");
         mappers = new ActorRef[3];
         reducers = new ActorRef[2];
-        // Initialisation des acteurs Mapper
-        
-    
-        // Initialisation des acteurs Reducer
-        for (int i = 0; i < 2 ; i++) {
+
+        for (int i = 0; i < 2; i++) {
             String reducerName = "reducer" + i;
             reducers[i] = actorSystem.actorOf(Props.create(ReducerActor.class), reducerName);
             System.out.println(reducerName);
@@ -48,33 +47,53 @@ public class AkkaService {
 
         for (int i = 0; i < mappers.length; i++) {
             String mapperName = "mapper" + System.currentTimeMillis() + "_" + i;
-            mappers[i] = actorSystem.actorOf(Props.create(MapperActor.class,reducersList), mapperName);
+            mappers[i] = actorSystem.actorOf(Props.create(MapperActor.class, reducersList), mapperName);
             System.out.println(mapperName);
         }
-    }    
+    }
 
-    // Méthode pour distribuer les lignes du fichier aux Mappers
     public void distributeLines(MultipartFile file) {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
-            int mapperId = 0;
-            int lineNumber = 0;
             while ((line = reader.readLine()) != null) {
-                System.out.println("Distributing line {"+ lineNumber+"} to mapper {"+ mapperId+"}");
-                mappers[mapperId].tell(line, ActorRef.noSender());
-                mapperId = (mapperId + 1) % mappers.length;
-                lineNumber++;
+                System.out.println("Distributing line: " + line);
+                for (ActorRef mapper : mappers) {
+                    mapper.tell(line, ActorRef.noSender());
+                }
             }
-            System.out.println("Total lines distributed: {"+ lineNumber+"}");
         } catch (Exception e) {
-            System.out.println("Error distributing file lines"+ e);
+            System.out.println("Error distributing file lines" + e);
         }
     }
 
-    // Méthode pour interroger les Reducers pour obtenir le nombre d'occurrences d'un mot
-    public CompletionStage<Object> queryReducer(ActorRef reducer, String word) {
-        // Envoyer une demande à l'acteur Reducer et attendre une réponse
-        return Patterns.ask(reducer, word, Duration.ofSeconds(5));
-    }
+    public int searchWordOccurrences(String word) {
+        int totalOccurrences = 0;
+        Timeout timeout = new Timeout(Duration.create(5, "seconds"));
 
+        for (ActorRef reducer : reducersList) {
+            try {
+                Future<Object> future = Patterns.ask(reducer, new ReducerActor.getWord(word), timeout);
+
+                CompletionStage<Object> javaFuture = FutureConverters.toJava(future);
+
+                CompletionStage<Integer> processedFuture = javaFuture.thenApply(response -> {
+                    if (response instanceof ReducerActor.WordCount) {
+                        return ((ReducerActor.WordCount) response).count;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                Integer result = processedFuture.toCompletableFuture().get(5, TimeUnit.SECONDS);
+                totalOccurrences += result;
+            } catch (AskTimeoutException e) {
+                System.err.println("Timeout occurred while waiting for response from reducer: " + e.getMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println(totalOccurrences);
+        return totalOccurrences;
+    }
 }

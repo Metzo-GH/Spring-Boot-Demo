@@ -1,41 +1,53 @@
 package com.example.mapreduce.Actor;
 
-import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.UntypedActor;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapperActor extends AbstractActor {
+public class MapperActor extends UntypedActor {
 
-    private final Map<String, Integer> wordCounts = new HashMap<>();
-
-     private List<ActorRef> reducersList;
+    private final List<ActorRef> reducersList;
+    private Map<String, Integer> wordCounts;
 
     public MapperActor(List<ActorRef> reducersList) {
         this.reducersList = reducersList;
+        this.wordCounts = new HashMap<>();
     }
-   
+
     @Override
-    public Receive createReceive() {
-        return receiveBuilder()
-                .match(String.class, line -> {
-                    String[] words = line.split("\\s+");
-                    for (String word : words) {
-                        wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
-                        ActorRef reducerId = partition(word); // Utilisation de la méthode de partitionnement
-                        reducerId.tell(word, ActorRef.noSender());
-                    }
-                })
-                .matchEquals("getCounts", message -> {
-                    getSender().tell(wordCounts, getSelf());
-                })
-                .build();
+    public void onReceive(Object message) throws Throwable {
+        if (message instanceof String) {
+            String line = (String) message;
+            String[] words = line.split("\\s+");
+            for (String word : words) {
+                ActorRef reducer = partition(word);
+                if (!wordCounts.containsKey(word)) {
+                    wordCounts.put(word, 1);
+                } else {
+                    wordCounts.put(word, wordCounts.get(word) + 1);
+                }
+            }
+            sendWordCountsToReducers();
+        } else {
+            unhandled(message);
+        }
+    }
+
+    private void sendWordCountsToReducers() {
+        for (Map.Entry<String, Integer> entry : wordCounts.entrySet()) {
+            String word = entry.getKey();
+            int count = entry.getValue();
+            ActorRef reducer = partition(word);
+            reducer.tell(new ReducerActor.WordCount(word, count), getSelf());
+        }
+        wordCounts.clear();
     }
 
     private ActorRef partition(String word) {
-    
-        return reducersList.get(Math.abs(word.hashCode()) % reducersList.size());
+        int reducerIndex = Math.abs(word.hashCode()) % reducersList.size();
+        return reducersList.get(reducerIndex);
     }
 }
